@@ -1,4 +1,6 @@
-
+/**
+ * Copyright (C) 2011 Samira Tasharofi
+ */
 package akka.setack
 import akka.setack.core.TestExecutionManager
 import org.junit.After

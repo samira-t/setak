@@ -1,6 +1,7 @@
 /**
- * Copyright (C) 2009-2011 Typesafe Inc. <http://www.typesafe.com>
+ * Copyright (C) 2011 Samira Tasharofi
  */
+
 package akka.setack.core
 
 import akka.actor._

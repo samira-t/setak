@@ -1,4 +1,7 @@
 
+/**
+ * Copyright (C) 2011 Samira Tasharofi
+ */
 package akka.setack
 
 object TestConfig {
