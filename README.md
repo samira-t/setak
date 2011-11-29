@@ -4,7 +4,9 @@ Setak Testing Framework
 Overview
 ---------
 
-*Setak* is a testing framework for testing [Akka](http://akka.io actors). It facilitates writing unit and integration tests for actor applications by allowing the programmers to 
+__Setak__ is a testing framework for testing [Akka](http://akka.io) actors. 
+It facilitates writing unit and integration tests for actor applications by allowing the programmers to 
+
 - control the non-determinism in the concurrent actor systems; and 
 
 - manage the asynchrony by checking the assertions when the system is stable
