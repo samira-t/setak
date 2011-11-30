@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2011 Samira Tasharofi
  */
-package akka.setack.core
+package akka.setak.core
 
 import scala.collection.mutable.HashSet
 import scala.collection.mutable.ListBuffer

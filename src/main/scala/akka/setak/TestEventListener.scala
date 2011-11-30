@@ -1,5 +1,5 @@
 
-package akka.setack
+package akka.setak
 
 import akka.event.EventHandler
 import akka.event.EventHandler.{ Event, Error }

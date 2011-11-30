@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2011 Samira Tasharofi
  */
-package akka.setack.util
+package akka.setak.util
 import akka.actor.LocalActorRef
 import akka.actor.Actor
 import akka.japi.Creator
@@ -11,7 +11,7 @@ import akka.event.EventHandler
 import java.lang.reflect.InvocationTargetException
 import com.eaio.uuid.UUID
 import akka.actor.ActorRef
-import akka.setack.core.TestActorRef
+import akka.setak.core.TestActorRef
 
 /**
  * @author <a href="http://www.cs.illinois.edu/homes/tasharo1">Samira Tasharofi</a>

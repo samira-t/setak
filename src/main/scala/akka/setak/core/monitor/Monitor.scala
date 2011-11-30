@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2011 Samira Tasharofi
  */
-package akka.setack.core.monitor
+package akka.setak.core.monitor
 import akka.actor.Actor
 import akka.dispatch.MessageInvocation
 import scala.collection.mutable.ListBuffer
@@ -9,9 +9,9 @@ import akka.actor.ActorRef
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.HashSet
 import scala.collection.mutable.HashMap
-import akka.setack.core.TestMessageInvocation
-import akka.setack.core.RealMessageInvocation
-import akka.setack.core.MessageEventEnum._
+import akka.setak.core.TestMessageInvocation
+import akka.setak.core.RealMessageInvocation
+import akka.setak.core.MessageEventEnum._
 import akka.actor.LocalActorRef
 
 abstract class MonitorActorMessage

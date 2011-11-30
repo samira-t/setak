@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2011 Samira Tasharofi
  */
-package akka.setack
+package akka.setak
 import core.TestExecutionManager
 import core.monitor.TraceMonitorActor
 import util.TestMessageUtil
@@ -14,7 +14,7 @@ import akka.actor.Actor
 import akka.japi.Creator
 import akka.actor.UntypedChannel
 
-trait SetackTest {
+trait setakTest {
 
   var traceMonitorActor = akka.actor.Actor.actorOf[TraceMonitorActor].start
   var testExecutionManager = new TestExecutionManager(traceMonitorActor)

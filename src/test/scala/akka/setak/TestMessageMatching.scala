@@ -1,15 +1,15 @@
 /**
  * Copyright (C) 2011 Samira Tasharofi
  */
-package akka.setack.test
+package akka.setak.test
 
-import akka.setack._
+import akka.setak._
 import org.junit.Test
 import org.junit.Before
 import org.junit.After
-import akka.setack.core.TestMessageInvocation
-import akka.setack.core.TestActorRef
-import akka.setack.Commons._
+import akka.setak.core.TestMessageInvocation
+import akka.setak.core.TestActorRef
+import akka.setak.Commons._
 import akka.actor.Actor
 import scala.collection.mutable.HashSet
 
@@ -25,7 +25,7 @@ class IntBoolActor extends Actor {
   }
 }
 
-class JUnitTestMessageMatching extends SetackJUnit with org.scalatest.junit.JUnitSuite {
+class JUnitTestMessageMatching extends setakJUnit with org.scalatest.junit.JUnitSuite {
 
   var a: TestActorRef = null
   var intAny: TestMessageInvocation = null
@@ -64,7 +64,7 @@ class JUnitTestMessageMatching extends SetackJUnit with org.scalatest.junit.JUni
 
 }
 
-class ScalaTestMessageMatching extends SetackFlatSpec with org.scalatest.matchers.ShouldMatchers {
+class ScalaTestMessageMatching extends setakFlatSpec with org.scalatest.matchers.ShouldMatchers {
 
   var testActor: TestActorRef = null
   var intAny: TestMessageInvocation = null

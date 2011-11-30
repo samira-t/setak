@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2011 Samira Tasharofi
  */
-package akka.setack.core
+package akka.setak.core
 import akka.actor.Actor
 import akka.actor.ActorRef
 import monitor.NotProcessedMessages
@@ -9,7 +9,7 @@ import monitor.AllDeliveredMessagesAreProcessed
 import akka.actor.LocalActorRef
 import scala.collection.mutable.HashSet
 import scala.collection.mutable.ArrayBuffer
-import akka.setack.TestConfig
+import akka.setak.TestConfig
 import monitor._
 
 /**

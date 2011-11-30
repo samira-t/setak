@@ -2,7 +2,7 @@ package akka
 
 import akka.event.EventHandler
 
-package object setack {
+package object setak {
   def filterEvents[T](eventFilters: Iterable[EventFilter])(block: ⇒ T): T = {
     EventHandler.notify(TestEvent.Mute(eventFilters.toSeq))
     try {

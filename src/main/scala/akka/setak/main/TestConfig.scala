@@ -2,7 +2,7 @@
 /**
  * Copyright (C) 2011 Samira Tasharofi
  */
-package akka.setack
+package akka.setak
 
 object TestConfig {
   val maxTryForStability = 20

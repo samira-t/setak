@@ -1,17 +1,17 @@
 /**
  * Copyright (C) 2011 Samira Tasharofi
  */
-package akka.setack.test
+package akka.setak.test
 import akka.actor.Actor
 import akka.actor.ActorRef
 import org.junit.Test
 import org.junit.Before
 import org.junit.After
-import akka.setack.core.TestMessageInvocation
-import akka.setack.core.TestMessageInvocationSequence._
-import akka.setack.core.TestActorRef
-import akka.setack.Commons._
-import akka.setack._
+import akka.setak.core.TestMessageInvocation
+import akka.setak.core.TestMessageInvocationSequence._
+import akka.setak.core.TestActorRef
+import akka.setak.Commons._
+import akka.setak._
 import scala.collection.mutable.ListBuffer
 
 class SampleActor(var brother: ActorRef = null) extends Actor {
@@ -24,7 +24,7 @@ class SampleActor(var brother: ActorRef = null) extends Actor {
   }
 }
 
-class TestFutureMeesages extends SetackJUnit with org.scalatest.junit.JUnitSuite {
+class TestFutureMeesages extends setakJUnit with org.scalatest.junit.JUnitSuite {
 
   var a: TestActorRef = null
   var b: TestActorRef = null

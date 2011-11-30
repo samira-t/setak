@@ -2,7 +2,7 @@
  * Copyright (C) 2011 Samira Tasharofi
  */
 
-package akka.setack.core
+package akka.setak.core
 
 import akka.actor._
 import java.net.InetSocketAddress
@@ -183,8 +183,8 @@ class TestActorRef(
         future
       }
       case _ ⇒ {
-        val newTimeout = timeout + akka.setack.TestConfig.sleepInterval * akka.setack.TestConfig.sleepInterval
-        //(akka.setack.TestConfig.sleepInterval^2 * (akka.setack.TestConfig.maxTryForStability ^ 2 + akka.setack.TestConfig.maxTryForStability)  )
+        val newTimeout = timeout + akka.setak.TestConfig.sleepInterval * akka.setak.TestConfig.sleepInterval
+        //(akka.setak.TestConfig.sleepInterval^2 * (akka.setak.TestConfig.maxTryForStability ^ 2 + akka.setak.TestConfig.maxTryForStability)  )
         val future = createFuture(newTimeout, channel)
         invocation = new RealMessageInvocation(this, message, future)
         _cloudMessages.add(invocation)

@@ -1,17 +1,17 @@
 /**
  * Copyright (C) 2011 Samira Tasharofi
  */
-package akka.setack.util
+package akka.setak.util
 import akka.dispatch.MessageInvocation
-import akka.setack.core.TestActorRef
+import akka.setak.core.TestActorRef
 import scala.collection.mutable.ListBuffer
-import akka.setack.core.monitor._
-import akka.setack.core.TestMessageInvocation
+import akka.setak.core.monitor._
+import akka.setak.core.TestMessageInvocation
 import akka.actor.UntypedChannel
-import akka.setack.core.TestMessageInvocationSequence
-import akka.setack.core.TestSchedule
+import akka.setak.core.TestMessageInvocationSequence
+import akka.setak.core.TestSchedule
 import scala.collection.mutable.HashSet
-import akka.setack.core.MessageEventEnum
+import akka.setak.core.MessageEventEnum
 import scala.collection.mutable.ArrayBuffer
 import akka.actor.ActorRef
 

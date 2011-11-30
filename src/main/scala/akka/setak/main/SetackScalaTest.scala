@@ -1,9 +1,9 @@
 /**
  * Copyright (C) 2011 Samira Tasharofi
  */
-package akka.setack
+package akka.setak
 
-trait SetackFlatSpec extends SetackTest with org.scalatest.FlatSpec with org.scalatest.BeforeAndAfterEach {
+trait setakFlatSpec extends setakTest with org.scalatest.FlatSpec with org.scalatest.BeforeAndAfterEach {
 
   override def beforeEach() {
     super.superBeforeEach()
@@ -20,7 +20,7 @@ trait SetackFlatSpec extends SetackTest with org.scalatest.FlatSpec with org.sca
 
 }
 
-trait SetackWordSpec extends SetackTest with org.scalatest.WordSpec with org.scalatest.BeforeAndAfterEach {
+trait setakWordSpec extends setakTest with org.scalatest.WordSpec with org.scalatest.BeforeAndAfterEach {
 
   override def beforeEach() {
     super.superBeforeEach()

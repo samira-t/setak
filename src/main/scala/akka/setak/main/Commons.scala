@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2011 Samira Tasharofi
  */
-package akka.setack
+package akka.setak
 
 import akka.actor.Actor
 import akka.actor.Actor._

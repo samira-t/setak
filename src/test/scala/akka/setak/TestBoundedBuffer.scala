@@ -1,18 +1,18 @@
 /**
  * Copyright (C) 2011 Samira Tasharofi
  */
-package akka.setack.test
+package akka.setak.test
 
 import akka.actor.Actor
 import akka.actor.ActorRef
 import org.junit.Test
 import org.junit.Before
 import org.junit.After
-import akka.setack.core.TestMessageInvocation
-import akka.setack.core.TestMessageInvocationSequence._
-import akka.setack.core.TestActorRef
-import akka.setack.SetackJUnit
-import akka.setack.Commons._
+import akka.setak.core.TestMessageInvocation
+import akka.setak.core.TestMessageInvocationSequence._
+import akka.setak.core.TestActorRef
+import akka.setak.setakJUnit
+import akka.setak.Commons._
 
 abstract class BufferMessage
 case class Put(x: Int) extends BufferMessage
@@ -87,7 +87,7 @@ class Producer(buf: ActorRef) extends Actor {
   }
 }
 
-class TestBoundedBuffer extends SetackJUnit with org.scalatest.junit.JUnitSuite {
+class TestBoundedBuffer extends setakJUnit with org.scalatest.junit.JUnitSuite {
   var buf: TestActorRef = _
   var consumer: TestActorRef = _
   var producer: TestActorRef = _

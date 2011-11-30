@@ -1,11 +1,11 @@
 /**
  * Copyright (C) 2011 Samira Tasharofi
  */
-package akka.setack.util
-import akka.setack.core.TestExecutionManager
-import akka.setack.core.TestMessageInvocationSequence
-import akka.setack.core.TestSchedule
-import akka.setack.core.TestActorRef
+package akka.setak.util
+import akka.setak.core.TestExecutionManager
+import akka.setak.core.TestMessageInvocationSequence
+import akka.setak.core.TestSchedule
+import akka.setak.core.TestActorRef
 import akka.actor.Actor
 
 /**

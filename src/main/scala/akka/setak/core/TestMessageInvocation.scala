@@ -1,11 +1,11 @@
 /**
  * Copyright (C) 2011 Samira Tasharofi
  */
-package akka.setack.core
+package akka.setak.core
 import akka.dispatch.MessageInvocation
 import scala.collection.mutable.ListBuffer
 import akka.actor.UntypedChannel
-import akka.setack.Commons._
+import akka.setak.Commons._
 
 case class RealMessageInvocation(_reciever: UntypedChannel, _message: Any, _sender: UntypedChannel) {
   def receiver = _reciever
