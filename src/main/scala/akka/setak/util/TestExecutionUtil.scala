@@ -3,7 +3,7 @@
  */
 package akka.setak.util
 import akka.setak.core.TestExecutionManager
-import akka.setak.core.TestMessageSequence
+import akka.setak.core.TestMessageEnvelopSequence
 import akka.setak.core.TestSchedule
 import akka.setak.core.TestActorRef
 import akka.actor.Actor
@@ -19,7 +19,7 @@ object TestExecutionUtil {
    * a set of partial orders between the messages. The receivers of the messages in each partial order should
    * be the same (an instance of TestActorRef)
    */
-  def setSchedule(partialOrders: Set[TestMessageSequence]) {
+  def setSchedule(partialOrders: Set[TestMessageEnvelopSequence]) {
     /*
      * TODO: check if the receivers of all messages in each partial order are the same
      */

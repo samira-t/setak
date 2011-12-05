@@ -4,29 +4,29 @@
 package akka.setak
 import core.TestExecutionManager
 import core.monitor.TraceMonitorActor
-import util.TestMessageUtil
-import core.TestMessage
+import util.TestMessageEnvelopUtil
+import core.TestMessageEnvelop
 import core.TestActorRef
 import util.TestActorRefFactory
 import util.TestExecutionUtil
-import core.TestMessageSequence
+import core.TestMessageEnvelopSequence
 import akka.actor.Actor
 import akka.japi.Creator
 import akka.actor.UntypedChannel
 
 trait SetakTest {
 
-  var traceMonitorActor = akka.actor.Actor.actorOf[TraceMonitorActor].start
+  var traceMonitorActor = akka.actor.Actor.actorOf[TraceMonitorActor].start()
   var testExecutionManager = new TestExecutionManager(traceMonitorActor)
-  var testMessageUtil = new TestMessageUtil(traceMonitorActor)
+  var testMessageUtil = new TestMessageEnvelopUtil(traceMonitorActor)
   var testActorRefFactory = new TestActorRefFactory(traceMonitorActor)
   var testInitialized = true
 
   def superBeforeEach() {
     if (!testInitialized) {
-      traceMonitorActor = akka.actor.Actor.actorOf[TraceMonitorActor].start
+      traceMonitorActor = akka.actor.Actor.actorOf[TraceMonitorActor].start()
       testExecutionManager = new TestExecutionManager(traceMonitorActor)
-      testMessageUtil = new TestMessageUtil(traceMonitorActor)
+      testMessageUtil = new TestMessageEnvelopUtil(traceMonitorActor)
       testActorRefFactory = new TestActorRefFactory(traceMonitorActor)
     }
   }
@@ -58,31 +58,31 @@ trait SetakTest {
   /*
    * testMessageUtil API calls
    */
-  def testMessage(sender: UntypedChannel, receiver: UntypedChannel, message: Any) =
-    testMessageUtil.testMessage(sender, receiver, message)
+  def testMessageEnvelop(sender: UntypedChannel, receiver: UntypedChannel, message: Any) =
+    testMessageUtil.testMessageEnvelop(sender, receiver, message)
 
-  def testMessagePattern(sender: UntypedChannel, receiver: UntypedChannel, messagePattern: PartialFunction[Any, Any]) =
-    testMessageUtil.testMessagePattern(sender, receiver, messagePattern)
+  def testMessagePatternEnvelop(sender: UntypedChannel, receiver: UntypedChannel, messagePattern: PartialFunction[Any, Any]) =
+    testMessageUtil.testMessagePatternEnvelop(sender, receiver, messagePattern)
 
   /**
    * Checks if the message is delivered or not by asking from trace monitor actor.
    */
-  def isDelivered(testMessage: TestMessage) = testMessageUtil.isDelivered(testMessage)
+  def isDelivered(testMessage: TestMessageEnvelop) = testMessageUtil.isDelivered(testMessage)
 
   /**
    * @return the number of the test messages delivered.
    */
-  def deliveryCount(testMessage: TestMessage) = testMessageUtil.deliveryCount(testMessage)
+  def deliveryCount(testMessage: TestMessageEnvelop) = testMessageUtil.deliveryCount(testMessage)
 
   /**
    * Checks if the message is processed by asking from trace monitor actor.
    */
-  def isProcessed(testMessage: TestMessage) = testMessageUtil.isProcessed(testMessage)
+  def isProcessed(testMessage: TestMessageEnvelop) = testMessageUtil.isProcessed(testMessage)
 
   /**
    * @return the number of the test messages processed.
    */
-  def processingCount(testMessage: TestMessage) = testMessageUtil.processingCount(testMessage)
+  def processingCount(testMessage: TestMessageEnvelop) = testMessageUtil.processingCount(testMessage)
 
   /*
  * TestExecutionUtil API call
@@ -92,7 +92,7 @@ trait SetakTest {
    * a set of partial orders between the messages. The receivers of the messages in each partial order should
    * be the same (an instance of TestActorRef)
    */
-  def setSchedule(partialOrders: TestMessageSequence*) = TestExecutionUtil.setSchedule(partialOrders.toSet)
+  def setSchedule(partialOrders: TestMessageEnvelopSequence*) = TestExecutionUtil.setSchedule(partialOrders.toSet)
 
   /*
    * testActorRefFactory API calls

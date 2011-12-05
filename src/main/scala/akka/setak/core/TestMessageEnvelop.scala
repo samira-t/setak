@@ -2,18 +2,17 @@
  * Copyright (C) 2011 Samira Tasharofi
  */
 package akka.setak.core
-import akka.dispatch.MessageInvocation
 import scala.collection.mutable.ListBuffer
 import akka.actor.UntypedChannel
 import akka.setak.Commons._
 
-case class RealMessageInvocation(_reciever: UntypedChannel, _message: Any, _sender: UntypedChannel) {
+case class RealMessageEnvelop(_reciever: UntypedChannel, _message: Any, _sender: UntypedChannel) {
   def receiver = _reciever
   def message = _message
   def sender = _sender
 
-  def ==(otherInvocation: RealMessageInvocation): Boolean =
-    (receiver == otherInvocation.receiver) && (sender == otherInvocation.sender) && (message == otherInvocation.message)
+  def ==(otherEnvelop: RealMessageEnvelop): Boolean =
+    (receiver == otherEnvelop.receiver) && (sender == otherEnvelop.sender) && (message == otherEnvelop.message)
 }
 
 /**
@@ -29,10 +28,10 @@ object MessageEventEnum extends Enumeration {
 }
 
 /**
- * Each test message invocation is a message defined by the user and
+ * Each test message envelop is a message defined by the user and
  * can be matched with real messages during the execution.
  *
- * The message property in the test message invocation
+ * The message property in the test message envelop
  * can be an object or a pattern (partial function)
  *
  * The wild card for the sender and receiver is anyActorRef.
@@ -40,7 +39,7 @@ object MessageEventEnum extends Enumeration {
  *
  * @author <a href="http://www.cs.illinois.edu/homes/tasharo1">Samira Tasharofi</a>
  */
-class TestMessage {
+class TestMessageEnvelop {
 
   var _receiver: UntypedChannel = null
   var _sender: UntypedChannel = null
@@ -71,15 +70,15 @@ class TestMessage {
 
   def messagePattern = _messagePattern
 
-  def matchWithRealInvocation(realInvocation: RealMessageInvocation): Boolean = {
-    log("matching " + this.toString() + " " + realInvocation.toString())
-    if (!compareChannels(this.sender, realInvocation.sender)) return false
+  def matchWithRealEnvelop(realEnvelop: RealMessageEnvelop): Boolean = {
+    log("matching " + this.toString() + " " + realEnvelop.toString())
+    if (!compareChannels(this.sender, realEnvelop.sender)) return false
 
-    if (!compareChannels(this.receiver, realInvocation.receiver)) return false
+    if (!compareChannels(this.receiver, realEnvelop.receiver)) return false
 
-    if (this.message != null && this.message != anyMessage && this.message != realInvocation.message) return false
+    if (this.message != null && this.message != anyMessage && this.message != realEnvelop.message) return false
 
-    if (this.messagePattern != null && !this.messagePattern.isDefinedAt(realInvocation.message)) return false
+    if (this.messagePattern != null && !this.messagePattern.isDefinedAt(realEnvelop.message)) return false
     log(" returns true")
     return true
   }
@@ -92,8 +91,8 @@ class TestMessage {
    * This operator can be applied to test messages to create a sequence(order) of the test messages which can be used for
    * deterministic execution via "setScheudle" API.
    */
-  /*  def ->(testMessage: TestMessage): TestMessageSequence = {
-    return (new TestMessageSequence(this) -> testMessage)
+  /*  def ->(testMessage: TestMessageEnvelop): TestMessageEnvelopSequence = {
+    return (new TestMessageEnvelopSequence(this) -> testMessage)
   }
 */
   override def toString(): String = "(" + sender + "," + receiver + "," + (if (message != null) message else messagePattern) + ")"
@@ -105,22 +104,22 @@ class TestMessage {
 }
 
 /**
- * Each test message invocation sequence is an ordered set of test message
- * invocations. The sequence is defined by using '->' operator.
+ * Each test message envelop sequence is an ordered set of test message
+ * envelops. The sequence is defined by using '->' operator.
  * The assumption is that the sender of all messages in a given sequence are the same.
  *
  * @author <a href="http://www.cs.illinois.edu/homes/tasharo1">Samira Tasharofi</a>
  */
-class TestMessageSequence(testMessage: TestMessage) {
+class TestMessageEnvelopSequence(testMessage: TestMessageEnvelop) {
 
-  protected var _messageSequence = ListBuffer[TestMessage](testMessage)
+  protected var _messageSequence = ListBuffer[TestMessageEnvelop](testMessage)
 
-  def ->(testMessage: TestMessage): TestMessageSequence = {
+  def ->(testMessage: TestMessageEnvelop): TestMessageEnvelopSequence = {
     _messageSequence.+=(testMessage)
     return this
   }
 
-  def head: TestMessage = _messageSequence.headOption.orNull
+  def head: TestMessageEnvelop = _messageSequence.headOption.orNull
 
   def removeHead: Boolean = {
     if (!_messageSequence.isEmpty) {
@@ -136,11 +135,11 @@ class TestMessageSequence(testMessage: TestMessage) {
     return _messageSequence.isEmpty
   }
 
-  def indexOf(invocation: RealMessageInvocation): Int = {
-    return _messageSequence.findIndexOf(m ⇒ m.matchWithRealInvocation(invocation))
+  def indexOf(envelop: RealMessageEnvelop): Int = {
+    return _messageSequence.findIndexOf(m ⇒ m.matchWithRealEnvelop(envelop))
   }
 
-  def equals(otherSequence: TestMessageSequence): Boolean = {
+  def equals(otherSequence: TestMessageEnvelopSequence): Boolean = {
     for (msg ← _messageSequence) {
       if (!otherSequence.head.equals(msg)) return false
     }
@@ -149,6 +148,6 @@ class TestMessageSequence(testMessage: TestMessage) {
 
 }
 
-object TestMessageSequence {
-  implicit def toSequence(testMessage: TestMessage): TestMessageSequence = new TestMessageSequence(testMessage)
+object TestMessageEnvelopSequence {
+  implicit def toSequence(testMessage: TestMessageEnvelop): TestMessageEnvelopSequence = new TestMessageEnvelopSequence(testMessage)
 }

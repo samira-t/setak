@@ -5,7 +5,7 @@
 package akka.setak
 
 object TestConfig {
-  val maxTryForStability = 20
-  val sleepInterval = 100
+  var maxTryForStability = 20
+  var sleepInterval = 100
 }
 

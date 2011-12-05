@@ -29,7 +29,7 @@ class TestActorRef(
    * A container for the messges that should be posted to the mailbox later
    */
   @volatile
-  private var _cloudMessages = new HashSet[RealMessageInvocation]()
+  private var _cloudMessages = new HashSet[RealMessageEnvelop]()
 
   /**
    * A set of partial orders between the messages. It is used to remove some nondeterminism from the execution.
@@ -45,7 +45,8 @@ class TestActorRef(
     try {
       super.invoke(messageHandle)
     } finally {
-      traceMonitorActor ! AsyncMessageEvent(new RealMessageInvocation(messageHandle.receiver, messageHandle.message, messageHandle.channel), MessageEventEnum.Processed)
+      traceMonitorActor ! AsyncMessageEvent(new RealMessageEnvelop(messageHandle.receiver, messageHandle.message, messageHandle.channel), MessageEventEnum.Processed)
+      //checkForDeliveryFromCloud()
       log("sent processing" + messageHandle.message)
 
     }
@@ -56,7 +57,7 @@ class TestActorRef(
    */
   override def reply(message: Any) = {
     if (channel.isInstanceOf[ActorCompletableFuture]) {
-      traceMonitorActor ! ReplyMessageEvent(new RealMessageInvocation(channel, message, this))
+      traceMonitorActor ! ReplyMessageEvent(new RealMessageEnvelop(channel, message, this))
     }
     super.reply(message)
   }
@@ -67,7 +68,7 @@ class TestActorRef(
    */
   override def tryReply(message: Any): Boolean = {
     if (channel.isInstanceOf[ActorCompletableFuture]) {
-      traceMonitorActor ! ReplyMessageEvent(new RealMessageInvocation(channel, message, this))
+      traceMonitorActor ! ReplyMessageEvent(new RealMessageEnvelop(channel, message, this))
     }
     super.tryTell(message)
   }
@@ -94,7 +95,7 @@ class TestActorRef(
    */
   private def postMessageToMailboxWithoutCheck(message: Any, channel: UntypedChannel): Unit = {
     super.postMessageToMailbox(message, channel)
-    traceMonitorActor ! AsyncMessageEvent(new RealMessageInvocation(this, message, channel), Delivered)
+    traceMonitorActor ! AsyncMessageEvent(new RealMessageEnvelop(this, message, channel), Delivered)
   }
 
   /**
@@ -105,17 +106,17 @@ class TestActorRef(
    * 3) if the message is somewhere in the schedule other than the head, it keeps the message in the cloud
    */
   private def postMessageBySchedule(message: Any, channel: UntypedChannel) = synchronized {
-    val invocation = new RealMessageInvocation(this, message, channel)
-    log("message index:" + message + " " + _currentSchedule.leastIndexOf(invocation))
-    _currentSchedule.leastIndexOf(invocation) match {
+    val envelop = new RealMessageEnvelop(this, message, channel)
+    log("message index:" + message + " " + _currentSchedule.leastIndexOf(envelop))
+    _currentSchedule.leastIndexOf(envelop) match {
       case -1 ⇒ postMessageToMailboxWithoutCheck(message, channel)
       case 0 ⇒ {
-        _currentSchedule.removeFromHead(invocation)
-        log("removeFromSchedule: " + invocation.message)
+        _currentSchedule.removeFromHead(envelop)
+        log("removeFromSchedule: " + envelop.message)
         postMessageToMailboxWithoutCheck(message, channel)
         checkForDeliveryFromCloud()
       }
-      case _ ⇒ _cloudMessages.add(invocation) //; println("added to cloud" + invocation)
+      case _ ⇒ _cloudMessages.add(envelop) //; println("added to cloud" + envelop)
     }
 
   }
@@ -144,12 +145,12 @@ class TestActorRef(
     timeout: Long,
     channel: UntypedChannel): ActorCompletableFuture = {
     val future = super.postMessageToMailboxAndCreateFutureResultWithTimeout(message, timeout, channel)
-    traceMonitorActor ! AsyncMessageEvent(new RealMessageInvocation(this, message, future.asInstanceOf[ActorCompletableFuture]), Delivered)
+    traceMonitorActor ! AsyncMessageEvent(new RealMessageEnvelop(this, message, future.asInstanceOf[ActorCompletableFuture]), Delivered)
     future
   }
 
   /**
-   * It creates a future for the sender of the invocation
+   * It creates a future for the sender of the envelop
    */
   private def createFuture(
     timeout: Long,
@@ -171,25 +172,24 @@ class TestActorRef(
    */
   private def postMessageAndCreateFutureBySchedule(message: Any, timeout: Long, channel: UntypedChannel): ActorCompletableFuture = synchronized {
 
-    var invocation = new RealMessageInvocation(this, message, channel)
-    log("message index:" + message + " " + _currentSchedule.leastIndexOf(invocation))
-    _currentSchedule.leastIndexOf(invocation) match {
+    var envelop = new RealMessageEnvelop(this, message, channel)
+    log("message index:" + message + " " + _currentSchedule.leastIndexOf(envelop))
+    _currentSchedule.leastIndexOf(envelop) match {
       case -1 ⇒ postMessageToMailboxAndCreateFutureResultWithTimeoutWithoutCheck(message, timeout, channel)
       case 0 ⇒ {
-        val result = _currentSchedule.removeFromHead(invocation)
-        log("removeFromSchedule: " + invocation.message)
-        val future = postMessageToMailboxAndCreateFutureResultWithTimeoutWithoutCheck(message, timeout, channel)
+        val result = _currentSchedule.removeFromHead(envelop)
+        log("removeFromSchedule: " + envelop.message)
+        val newTimeout = timeout + akka.setak.TestConfig.sleepInterval * akka.setak.TestConfig.sleepInterval * timeout
+        val future = postMessageToMailboxAndCreateFutureResultWithTimeoutWithoutCheck(message, newTimeout, channel)
         checkForDeliveryFromCloud()
         future
       }
       case _ ⇒ {
-        val newTimeout = timeout + akka.setak.TestConfig.sleepInterval * akka.setak.TestConfig.sleepInterval
-        //(akka.setak.TestConfig.sleepInterval^2 * (akka.setak.TestConfig.maxTryForStability ^ 2 + akka.setak.TestConfig.maxTryForStability)  )
+        val newTimeout = timeout + akka.setak.TestConfig.sleepInterval * akka.setak.TestConfig.sleepInterval * timeout
         val future = createFuture(newTimeout, channel)
-        invocation = new RealMessageInvocation(this, message, future)
-        _cloudMessages.add(invocation)
-        log("added to cloud" + invocation + " " + newTimeout)
-        //println("new "+message.toString()+newTimeout)
+        envelop = new RealMessageEnvelop(this, message, future)
+        _cloudMessages.add(envelop)
+        log("added to cloud" + envelop + " " + newTimeout + " " + timeout)
         future
       }
     }
@@ -216,32 +216,32 @@ class TestActorRef(
   private def deliverFromCloud(): Boolean = {
 
     if (_currentSchedule.isEmpty) {
-      for (invocation ← _cloudMessages) {
-        _cloudMessages.-=(invocation)
-        postMessageToMailboxWithoutCheck(invocation.message, invocation.sender)
+      for (envelop ← _cloudMessages) {
+        _cloudMessages.-=(envelop)
+        postMessageToMailboxWithoutCheck(envelop.message, envelop.sender)
         return true
 
       }
     }
 
-    for (invocation ← _cloudMessages) {
-      if (_currentSchedule.leastIndexOf(invocation) == 0) {
-        _cloudMessages.-=(invocation)
-        log("removed from cloud" + _cloudMessages.size)
-        val result = _currentSchedule.removeFromHead(invocation)
-        postMessageToMailboxWithoutCheck(invocation.message, invocation.sender)
-        return result
+    for (envelop ← _cloudMessages) {
+      if (_currentSchedule.leastIndexOf(envelop) == 0) {
+        _cloudMessages.-=(envelop)
+        log("removed from cloud " + _cloudMessages.size)
+        val result = _currentSchedule.removeFromHead(envelop)
+        postMessageToMailboxWithoutCheck(envelop.message, envelop.sender)
+        return true
 
       }
     }
-    false
+    return false
 
   }
 
   /**
    * Adds a partial order between the message to the schedule
    */
-  def addPartialOrderToSchedule(po: TestMessageSequence) = synchronized {
+  def addPartialOrderToSchedule(po: TestMessageEnvelopSequence) = synchronized {
     if (_currentSchedule == null) _currentSchedule = new TestSchedule(Set(po))
     else _currentSchedule.addPartialOrder(po)
     log("current schedule= " + _currentSchedule.toString())

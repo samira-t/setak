@@ -3,22 +3,21 @@
  */
 package akka.setak.core.monitor
 import akka.actor.Actor
-import akka.dispatch.MessageInvocation
 import scala.collection.mutable.ListBuffer
 import akka.actor.ActorRef
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.HashSet
 import scala.collection.mutable.HashMap
-import akka.setak.core.TestMessage
-import akka.setak.core.RealMessageInvocation
+import akka.setak.core.TestMessageEnvelop
+import akka.setak.core.RealMessageEnvelop
 import akka.setak.core.MessageEventEnum._
 import akka.actor.LocalActorRef
 
 abstract class MonitorActorMessage
-case class AsyncMessageEvent(message: RealMessageInvocation, event: MessageEventType) extends MonitorActorMessage
-case class ReplyMessageEvent(message: RealMessageInvocation) extends MonitorActorMessage
-case class MatchedMessageEventCount(testMessage: TestMessage, event: MessageEventType) extends MonitorActorMessage
-case class AddTestMessage(testMessage: TestMessage) extends MonitorActorMessage
+case class AsyncMessageEvent(message: RealMessageEnvelop, event: MessageEventType) extends MonitorActorMessage
+case class ReplyMessageEvent(message: RealMessageEnvelop) extends MonitorActorMessage
+case class MatchedMessageEventCount(testMessage: TestMessageEnvelop, event: MessageEventType) extends MonitorActorMessage
+case class AddTestMessageEnvelop(testMessage: TestMessageEnvelop) extends MonitorActorMessage
 case object AllDeliveredMessagesAreProcessed extends MonitorActorMessage
 case object NotProcessedMessages extends MonitorActorMessage
 case object ClearState extends MonitorActorMessage
@@ -37,19 +36,19 @@ case object ClearState extends MonitorActorMessage
 
 class TraceMonitorActor() extends Actor {
 
-  var testMessagesInfo = new HashMap[TestMessage, Array[Int]]()
-  var deliveredAsyncMessages = new ArrayBuffer[RealMessageInvocation]()
-  var messageTrace = new ListBuffer[TestMessage]
+  var testMessagesInfo = new HashMap[TestMessageEnvelop, Array[Int]]()
+  var deliveredAsyncMessages = new ArrayBuffer[RealMessageEnvelop]()
+  var messageTrace = new ListBuffer[TestMessageEnvelop]
 
   def receive =
     {
-      case AddTestMessage(testMessage) ⇒ {
+      case AddTestMessageEnvelop(testMessage) ⇒ {
         testMessagesInfo.put(testMessage, Array(0, 0))
         self.reply()
       }
       case AsyncMessageEvent(message, event) ⇒ {
-        val matchedTestMessages = testMessagesInfo.filterKeys(m ⇒ m.matchWithRealInvocation(message))
-        for ((testMsg, dp) ← matchedTestMessages) {
+        val matchedTestMessageEnvelops = testMessagesInfo.filterKeys(m ⇒ m.matchWithRealEnvelop(message))
+        for ((testMsg, dp) ← matchedTestMessageEnvelops) {
           event match {
             case Delivered ⇒ {
               deliveredAsyncMessages.+=(message)
@@ -68,8 +67,8 @@ class TraceMonitorActor() extends Actor {
       }
       case ReplyMessageEvent(message) ⇒ {
         //        messageTrace.+=(message)
-        val matchedTestMessages = testMessagesInfo.filterKeys(m ⇒ m.matchWithRealInvocation(message))
-        for ((testMsg, dp) ← matchedTestMessages) {
+        val matchedTestMessageEnvelops = testMessagesInfo.filterKeys(m ⇒ m.matchWithRealEnvelop(message))
+        for ((testMsg, dp) ← matchedTestMessageEnvelops) {
           testMessagesInfo.update(testMsg, Array(dp(0) + 1, dp(1) + 1))
         }
 
@@ -90,9 +89,9 @@ class TraceMonitorActor() extends Actor {
       case NotProcessedMessages             ⇒ self.reply(deliveredAsyncMessages)
 
       case ClearState ⇒ {
-        testMessagesInfo = new HashMap[TestMessage, Array[Int]]()
-        deliveredAsyncMessages = new ArrayBuffer[RealMessageInvocation]()
-        messageTrace = new ListBuffer[TestMessage]
+        testMessagesInfo = new HashMap[TestMessageEnvelop, Array[Int]]()
+        deliveredAsyncMessages = new ArrayBuffer[RealMessageEnvelop]()
+        messageTrace = new ListBuffer[TestMessageEnvelop]
         self.reply()
 
       }

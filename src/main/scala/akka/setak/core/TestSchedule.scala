@@ -15,16 +15,16 @@ import scala.collection.mutable.ListBuffer
  */
 class TestSchedule {
 
-  private var TestMessageSequences = new HashSet[TestMessageSequence]
+  private var testMessageEnvelopSequences = new HashSet[TestMessageEnvelopSequence]
 
-  def this(schedule: Set[TestMessageSequence]) {
+  def this(schedule: Set[TestMessageEnvelopSequence]) {
     this()
-    for (TestMessageSequence ← schedule)
-      TestMessageSequences.+=(TestMessageSequence)
+    for (testMessageEnvelopSequence ← schedule)
+      testMessageEnvelopSequences.+=(testMessageEnvelopSequence)
   }
 
-  def addPartialOrder(po: TestMessageSequence) = synchronized {
-    TestMessageSequences.+=(po)
+  def addPartialOrder(po: TestMessageEnvelopSequence) = synchronized {
+    testMessageEnvelopSequences.+=(po)
   }
 
   /**
@@ -35,10 +35,10 @@ class TestSchedule {
    * 3) the index is -1: the message can be delivered without any constraints
    * (the message is not matched with any messages in the partial orders)
    */
-  def leastIndexOf(messageInvocation: RealMessageInvocation): Int = synchronized {
+  def leastIndexOf(messageEnvelop: RealMessageEnvelop): Int = synchronized {
     var leastIndex = -1
-    for (TestMessageSequence ← TestMessageSequences) {
-      val currIndex = TestMessageSequence.indexOf(messageInvocation)
+    for (testMessageEnvelopSequence ← testMessageEnvelopSequences) {
+      val currIndex = testMessageEnvelopSequence.indexOf(messageEnvelop)
       if (currIndex == 0) return currIndex
       else if (currIndex > 0 && leastIndex == -1)
         leastIndex = currIndex
@@ -53,13 +53,13 @@ class TestSchedule {
    * of partial orders in the schedule (move forward the pointer for the current
    * schedule).
    */
-  def removeFromHead(messageInvocation: RealMessageInvocation): Boolean = synchronized {
-    for (TestMessageSequence ← TestMessageSequences) {
-      if (TestMessageSequence.head != null &&
-        TestMessageSequence.head.matchWithRealInvocation(messageInvocation)) {
-        val result = TestMessageSequence.removeHead
-        if (TestMessageSequence.isEmpty)
-          TestMessageSequences.remove(TestMessageSequence)
+  def removeFromHead(messageEnvelop: RealMessageEnvelop): Boolean = synchronized {
+    for (testMessageEnvelopSequence ← testMessageEnvelopSequences) {
+      if (testMessageEnvelopSequence.head != null &&
+        testMessageEnvelopSequence.head.matchWithRealEnvelop(messageEnvelop)) {
+        val result = testMessageEnvelopSequence.removeHead
+        if (testMessageEnvelopSequence.isEmpty)
+          testMessageEnvelopSequences.remove(testMessageEnvelopSequence)
         return result
       }
     }
@@ -68,12 +68,12 @@ class TestSchedule {
   }
 
   def isEmpty = synchronized {
-    TestMessageSequences.isEmpty
+    testMessageEnvelopSequences.isEmpty
   }
 
   override def toString(): String = synchronized {
     var outString = "schedule = "
-    for (sequnece ← TestMessageSequences) {
+    for (sequnece ← testMessageEnvelopSequences) {
       outString += sequnece.messageSequence.mkString("->")
       outString += ", "
     }

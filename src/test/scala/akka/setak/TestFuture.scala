@@ -7,8 +7,8 @@ import akka.actor.ActorRef
 import org.junit.Test
 import org.junit.Before
 import org.junit.After
-import akka.setak.core.TestMessage
-import akka.setak.core.TestMessageSequence._
+import akka.setak.core.TestMessageEnvelop
+import akka.setak.core.TestMessageEnvelopSequence._
 import akka.setak.core.TestActorRef
 import akka.setak.Commons._
 import akka.setak._
@@ -28,17 +28,17 @@ class TestFutureMeesages extends SetakJUnit {
 
   var a: TestActorRef = null
   var b: TestActorRef = null
-  var m: TestMessage = null
-  var req2: TestMessage = null
-  var reply: TestMessage = null
+  var m: TestMessageEnvelop = null
+  var req2: TestMessageEnvelop = null
+  var reply: TestMessageEnvelop = null
 
   @Before
   def setUp {
     a = actorOf(new SampleActor()).start
     b = actorOf(new SampleActor(a)).start
-    m = testMessage(anyActorRef, a, 'm)
-    req2 = testMessage(anyActorRef, a, 'req2)
-    reply = testMessage(a, anyActorRef, 'reply)
+    m = testMessageEnvelop(anyActorRef, a, 'm)
+    req2 = testMessageEnvelop(anyActorRef, a, 'req2)
+    reply = testMessageEnvelop(a, anyActorRef, 'reply)
   }
 
   @Test
