@@ -9,7 +9,7 @@ import akka.actor.ActorRef
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.HashSet
 import scala.collection.mutable.HashMap
-import akka.setak.core.TestMessageInvocation
+import akka.setak.core.TestMessage
 import akka.setak.core.RealMessageInvocation
 import akka.setak.core.MessageEventEnum._
 import akka.actor.LocalActorRef
@@ -17,8 +17,8 @@ import akka.actor.LocalActorRef
 abstract class MonitorActorMessage
 case class AsyncMessageEvent(message: RealMessageInvocation, event: MessageEventType) extends MonitorActorMessage
 case class ReplyMessageEvent(message: RealMessageInvocation) extends MonitorActorMessage
-case class MatchedMessageEventCount(testMessage: TestMessageInvocation, event: MessageEventType) extends MonitorActorMessage
-case class AddTestMessage(testMessage: TestMessageInvocation) extends MonitorActorMessage
+case class MatchedMessageEventCount(testMessage: TestMessage, event: MessageEventType) extends MonitorActorMessage
+case class AddTestMessage(testMessage: TestMessage) extends MonitorActorMessage
 case object AllDeliveredMessagesAreProcessed extends MonitorActorMessage
 case object NotProcessedMessages extends MonitorActorMessage
 case object ClearState extends MonitorActorMessage
@@ -37,9 +37,9 @@ case object ClearState extends MonitorActorMessage
 
 class TraceMonitorActor() extends Actor {
 
-  var testMessagesInfo = new HashMap[TestMessageInvocation, Array[Int]]()
+  var testMessagesInfo = new HashMap[TestMessage, Array[Int]]()
   var deliveredAsyncMessages = new ArrayBuffer[RealMessageInvocation]()
-  var messageTrace = new ListBuffer[TestMessageInvocation]
+  var messageTrace = new ListBuffer[TestMessage]
 
   def receive =
     {
@@ -90,9 +90,9 @@ class TraceMonitorActor() extends Actor {
       case NotProcessedMessages             ⇒ self.reply(deliveredAsyncMessages)
 
       case ClearState ⇒ {
-        testMessagesInfo = new HashMap[TestMessageInvocation, Array[Int]]()
+        testMessagesInfo = new HashMap[TestMessage, Array[Int]]()
         deliveredAsyncMessages = new ArrayBuffer[RealMessageInvocation]()
-        messageTrace = new ListBuffer[TestMessageInvocation]
+        messageTrace = new ListBuffer[TestMessage]
         self.reply()
 
       }

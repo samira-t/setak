@@ -8,10 +8,10 @@ import akka.actor.ActorRef
 import org.junit.Test
 import org.junit.Before
 import org.junit.After
-import akka.setak.core.TestMessageInvocation
-import akka.setak.core.TestMessageInvocationSequence._
+import akka.setak.core.TestMessage
+import akka.setak.core.TestMessageSequence._
 import akka.setak.core.TestActorRef
-import akka.setak.setakJUnit
+import akka.setak.SetakJUnit
 import akka.setak.Commons._
 
 abstract class BufferMessage
@@ -87,15 +87,15 @@ class Producer(buf: ActorRef) extends Actor {
   }
 }
 
-class TestBoundedBuffer extends setakJUnit with org.scalatest.junit.JUnitSuite {
+class TestBoundedBuffer extends SetakJUnit {
   var buf: TestActorRef = _
   var consumer: TestActorRef = _
   var producer: TestActorRef = _
 
-  var put1: TestMessageInvocation = _
-  var put2: TestMessageInvocation = _
-  var put3: TestMessageInvocation = _
-  var get: TestMessageInvocation = _
+  var put1: TestMessage = _
+  var put2: TestMessage = _
+  var put3: TestMessage = _
+  var get: TestMessage = _
 
   @Before
   def setUp() {

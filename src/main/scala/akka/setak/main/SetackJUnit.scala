@@ -9,7 +9,7 @@ import org.junit.Before
 /**
  * @author <a href="http://www.cs.illinois.edu/homes/tasharo1">Samira Tasharofi</a>
  */
-trait setakJUnit extends setakTest {
+trait SetakJUnit extends SetakTest with org.scalatest.junit.JUnitSuite {
 
   @Before
   def superSetUp() {

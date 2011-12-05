@@ -241,7 +241,7 @@ class TestActorRef(
   /**
    * Adds a partial order between the message to the schedule
    */
-  def addPartialOrderToSchedule(po: TestMessageInvocationSequence) = synchronized {
+  def addPartialOrderToSchedule(po: TestMessageSequence) = synchronized {
     if (_currentSchedule == null) _currentSchedule = new TestSchedule(Set(po))
     else _currentSchedule.addPartialOrder(po)
     log("current schedule= " + _currentSchedule.toString())

@@ -40,7 +40,7 @@ object MessageEventEnum extends Enumeration {
  *
  * @author <a href="http://www.cs.illinois.edu/homes/tasharo1">Samira Tasharofi</a>
  */
-class TestMessageInvocation {
+class TestMessage {
 
   var _receiver: UntypedChannel = null
   var _sender: UntypedChannel = null
@@ -92,8 +92,8 @@ class TestMessageInvocation {
    * This operator can be applied to test messages to create a sequence(order) of the test messages which can be used for
    * deterministic execution via "setScheudle" API.
    */
-  /*  def ->(testMessage: TestMessageInvocation): TestMessageInvocationSequence = {
-    return (new TestMessageInvocationSequence(this) -> testMessage)
+  /*  def ->(testMessage: TestMessage): TestMessageSequence = {
+    return (new TestMessageSequence(this) -> testMessage)
   }
 */
   override def toString(): String = "(" + sender + "," + receiver + "," + (if (message != null) message else messagePattern) + ")"
@@ -111,16 +111,16 @@ class TestMessageInvocation {
  *
  * @author <a href="http://www.cs.illinois.edu/homes/tasharo1">Samira Tasharofi</a>
  */
-class TestMessageInvocationSequence(testMessage: TestMessageInvocation) {
+class TestMessageSequence(testMessage: TestMessage) {
 
-  protected var _messageSequence = ListBuffer[TestMessageInvocation](testMessage)
+  protected var _messageSequence = ListBuffer[TestMessage](testMessage)
 
-  def ->(testMessage: TestMessageInvocation): TestMessageInvocationSequence = {
+  def ->(testMessage: TestMessage): TestMessageSequence = {
     _messageSequence.+=(testMessage)
     return this
   }
 
-  def head: TestMessageInvocation = _messageSequence.headOption.orNull
+  def head: TestMessage = _messageSequence.headOption.orNull
 
   def removeHead: Boolean = {
     if (!_messageSequence.isEmpty) {
@@ -140,7 +140,7 @@ class TestMessageInvocationSequence(testMessage: TestMessageInvocation) {
     return _messageSequence.findIndexOf(m ⇒ m.matchWithRealInvocation(invocation))
   }
 
-  def equals(otherSequence: TestMessageInvocationSequence): Boolean = {
+  def equals(otherSequence: TestMessageSequence): Boolean = {
     for (msg ← _messageSequence) {
       if (!otherSequence.head.equals(msg)) return false
     }
@@ -149,6 +149,6 @@ class TestMessageInvocationSequence(testMessage: TestMessageInvocation) {
 
 }
 
-object TestMessageInvocationSequence {
-  implicit def toSequence(testMessage: TestMessageInvocation): TestMessageInvocationSequence = new TestMessageInvocationSequence(testMessage)
+object TestMessageSequence {
+  implicit def toSequence(testMessage: TestMessage): TestMessageSequence = new TestMessageSequence(testMessage)
 }

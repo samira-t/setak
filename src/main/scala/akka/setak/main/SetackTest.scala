@@ -5,16 +5,16 @@ package akka.setak
 import core.TestExecutionManager
 import core.monitor.TraceMonitorActor
 import util.TestMessageUtil
-import core.TestMessageInvocation
+import core.TestMessage
 import core.TestActorRef
 import util.TestActorRefFactory
 import util.TestExecutionUtil
-import core.TestMessageInvocationSequence
+import core.TestMessageSequence
 import akka.actor.Actor
 import akka.japi.Creator
 import akka.actor.UntypedChannel
 
-trait setakTest {
+trait SetakTest {
 
   var traceMonitorActor = akka.actor.Actor.actorOf[TraceMonitorActor].start
   var testExecutionManager = new TestExecutionManager(traceMonitorActor)
@@ -67,22 +67,22 @@ trait setakTest {
   /**
    * Checks if the message is delivered or not by asking from trace monitor actor.
    */
-  def isDelivered(testMessage: TestMessageInvocation) = testMessageUtil.isDelivered(testMessage)
+  def isDelivered(testMessage: TestMessage) = testMessageUtil.isDelivered(testMessage)
 
   /**
    * @return the number of the test messages delivered.
    */
-  def deliveryCount(testMessage: TestMessageInvocation) = testMessageUtil.deliveryCount(testMessage)
+  def deliveryCount(testMessage: TestMessage) = testMessageUtil.deliveryCount(testMessage)
 
   /**
    * Checks if the message is processed by asking from trace monitor actor.
    */
-  def isProcessed(testMessage: TestMessageInvocation) = testMessageUtil.isProcessed(testMessage)
+  def isProcessed(testMessage: TestMessage) = testMessageUtil.isProcessed(testMessage)
 
   /**
    * @return the number of the test messages processed.
    */
-  def processingCount(testMessage: TestMessageInvocation) = testMessageUtil.processingCount(testMessage)
+  def processingCount(testMessage: TestMessage) = testMessageUtil.processingCount(testMessage)
 
   /*
  * TestExecutionUtil API call
@@ -92,7 +92,7 @@ trait setakTest {
    * a set of partial orders between the messages. The receivers of the messages in each partial order should
    * be the same (an instance of TestActorRef)
    */
-  def setSchedule(partialOrders: TestMessageInvocationSequence*) = TestExecutionUtil.setSchedule(partialOrders.toSet)
+  def setSchedule(partialOrders: TestMessageSequence*) = TestExecutionUtil.setSchedule(partialOrders.toSet)
 
   /*
    * testActorRefFactory API calls

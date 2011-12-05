@@ -6,9 +6,9 @@ import akka.dispatch.MessageInvocation
 import akka.setak.core.TestActorRef
 import scala.collection.mutable.ListBuffer
 import akka.setak.core.monitor._
-import akka.setak.core.TestMessageInvocation
+import akka.setak.core.TestMessage
 import akka.actor.UntypedChannel
-import akka.setak.core.TestMessageInvocationSequence
+import akka.setak.core.TestMessageSequence
 import akka.setak.core.TestSchedule
 import scala.collection.mutable.HashSet
 import akka.setak.core.MessageEventEnum
@@ -30,14 +30,14 @@ class TestMessageUtil(traceMonitorActor: ActorRef) {
    * in the Monitor object so that it can set the set of test messages that
    * should be traced by the testMonitorActor.
    */
-  def testMessage(sender: UntypedChannel, receiver: UntypedChannel, message: Any): TestMessageInvocation = {
-    var msg = new TestMessageInvocation(sender, receiver, message)
+  def testMessage(sender: UntypedChannel, receiver: UntypedChannel, message: Any): TestMessage = {
+    var msg = new TestMessage(sender, receiver, message)
     (traceMonitorActor ? AddTestMessage(msg)).get
     msg
   }
 
-  def testMessagePattern(sender: UntypedChannel, receiver: UntypedChannel, messagePattern: PartialFunction[Any, Any]): TestMessageInvocation = {
-    var msg = new TestMessageInvocation(sender, receiver, messagePattern)
+  def testMessagePattern(sender: UntypedChannel, receiver: UntypedChannel, messagePattern: PartialFunction[Any, Any]): TestMessage = {
+    var msg = new TestMessage(sender, receiver, messagePattern)
     (traceMonitorActor ? AddTestMessage(msg)).get
     msg
   }
@@ -47,28 +47,28 @@ class TestMessageUtil(traceMonitorActor: ActorRef) {
   /**
    * Checks if the message is delivered or not by asking from trace monitor actor.
    */
-  def isDelivered(testMessage: TestMessageInvocation): Boolean = {
+  def isDelivered(testMessage: TestMessage): Boolean = {
     (traceMonitorActor ? MatchedMessageEventCount(testMessage, MessageEventEnum.Delivered)).mapTo[Int].get > 0
   }
 
   /**
    * @return the number of the test messages delivered.
    */
-  def deliveryCount(testMessage: TestMessageInvocation): Int = {
+  def deliveryCount(testMessage: TestMessage): Int = {
     (traceMonitorActor ? MatchedMessageEventCount(testMessage, MessageEventEnum.Delivered)).mapTo[Int].get
   }
 
   /**
    * Checks if the message is processed by asking from trace monitor actor.
    */
-  def isProcessed(testMessage: TestMessageInvocation): Boolean = {
+  def isProcessed(testMessage: TestMessage): Boolean = {
     (traceMonitorActor ? MatchedMessageEventCount(testMessage, MessageEventEnum.Processed)).mapTo[Int].get > 0
   }
 
   /**
    * @return the number of the test messages processed.
    */
-  def processingCount(testMessage: TestMessageInvocation): Int = {
+  def processingCount(testMessage: TestMessage): Int = {
     (traceMonitorActor ? MatchedMessageEventCount(testMessage, MessageEventEnum.Processed)).mapTo[Int].get
   }
 

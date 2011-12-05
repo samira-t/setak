@@ -4,10 +4,11 @@
 package akka.setak.test
 
 import akka.setak._
+
 import org.junit.Test
 import org.junit.Before
 import org.junit.After
-import akka.setak.core.TestMessageInvocation
+import akka.setak.core.TestMessage
 import akka.setak.core.TestActorRef
 import akka.setak.Commons._
 import akka.actor.Actor
@@ -25,13 +26,13 @@ class IntBoolActor extends Actor {
   }
 }
 
-class JUnitTestMessageMatching extends setakJUnit with org.scalatest.junit.JUnitSuite {
+class JUnitTestMessageMatching extends SetakJUnit {
 
   var a: TestActorRef = null
-  var intAny: TestMessageInvocation = null
-  var int1: TestMessageInvocation = null
-  var btrue: TestMessageInvocation = null
-  var bAny: TestMessageInvocation = null
+  var intAny: TestMessage = null
+  var int1: TestMessage = null
+  var btrue: TestMessage = null
+  var bAny: TestMessage = null
 
   @Before
   def setUp {
@@ -64,13 +65,13 @@ class JUnitTestMessageMatching extends setakJUnit with org.scalatest.junit.JUnit
 
 }
 
-class ScalaTestMessageMatching extends setakFlatSpec with org.scalatest.matchers.ShouldMatchers {
+class ScalaTestMessageMatching extends SetakFlatSpec with org.scalatest.matchers.ShouldMatchers {
 
   var testActor: TestActorRef = null
-  var intAny: TestMessageInvocation = null
-  var int1: TestMessageInvocation = null
-  var btrue: TestMessageInvocation = null
-  var bAny: TestMessageInvocation = null
+  var intAny: TestMessage = null
+  var int1: TestMessage = null
+  var btrue: TestMessage = null
+  var bAny: TestMessage = null
 
   override def setUp {
     testActor = actorOf[IntBoolActor].start

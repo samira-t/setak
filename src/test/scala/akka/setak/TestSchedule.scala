@@ -7,8 +7,8 @@ import akka.actor.ActorRef
 import org.junit.Test
 import org.junit.Before
 import org.junit.After
-import akka.setak.core.TestMessageInvocation
-import akka.setak.core.TestMessageInvocationSequence._
+import akka.setak.core.TestMessage
+import akka.setak.core.TestMessageSequence._
 import akka.setak.core.TestActorRef
 import akka.setak.Commons._
 import akka.setak._
@@ -24,13 +24,13 @@ class SampleActor(var brother: ActorRef = null) extends Actor {
   }
 }
 
-class TestFutureMeesages extends setakJUnit with org.scalatest.junit.JUnitSuite {
+class TestFutureMeesages extends SetakJUnit {
 
   var a: TestActorRef = null
   var b: TestActorRef = null
-  var m: TestMessageInvocation = null
-  var req2: TestMessageInvocation = null
-  var reply: TestMessageInvocation = null
+  var m: TestMessage = null
+  var req2: TestMessage = null
+  var reply: TestMessage = null
 
   @Before
   def setUp {

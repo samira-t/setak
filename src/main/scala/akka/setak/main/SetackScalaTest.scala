@@ -3,7 +3,7 @@
  */
 package akka.setak
 
-trait setakFlatSpec extends setakTest with org.scalatest.FlatSpec with org.scalatest.BeforeAndAfterEach {
+trait SetakFlatSpec extends SetakTest with org.scalatest.FlatSpec with org.scalatest.BeforeAndAfterEach {
 
   override def beforeEach() {
     super.superBeforeEach()
@@ -20,7 +20,7 @@ trait setakFlatSpec extends setakTest with org.scalatest.FlatSpec with org.scala
 
 }
 
-trait setakWordSpec extends setakTest with org.scalatest.WordSpec with org.scalatest.BeforeAndAfterEach {
+trait SetakWordSpec extends SetakTest with org.scalatest.WordSpec with org.scalatest.BeforeAndAfterEach {
 
   override def beforeEach() {
     super.superBeforeEach()
