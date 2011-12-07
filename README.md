@@ -23,8 +23,8 @@ Setak depends on:
 - [Scala 2.9.1](http://www.scala-lang.org/)
 - [Akka 1.2](http://akka.io/)
 - [JUnit 4.5](http://junit.sourceforge.net), for writing tests in JUnit format
-- [ScalaTest 1.6.1](http://www.scalatest.org), for writing tests in ScalaTest format
-- [Sbt 0.11](https://github.com/harrah/xsbt/wiki), for compiling the source code and running examples (examples are in the test folder)
+- [ScalaTest 1.6.1](http://www.scalatest.org), for writing tests in FlatSpec or WordSpec format
+- [sbt 0.11](https://github.com/harrah/xsbt/wiki), for compiling the source code and running examples (examples are in the test folder)
 
 
 How to Use

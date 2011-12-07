@@ -17,7 +17,7 @@ object setakBuild extends Build {
     organization := "edu.illinois",
     version := "1.0-SNAPSHOT",
     resolvers += "Akka Repo" at "http://akka.io/repository",
-    libraryDependencies ++= Seq("se.scalablesolutions.akka" % "akka-actor" % "1.2-RC6",
+    libraryDependencies ++= Seq("se.scalablesolutions.akka" % "akka" % "1.2-RC6",
                                 "junit"                   % "junit"               % "4.5",
                                 "org.scalatest"           % "scalatest_2.9.0"     % "1.6.1"),
     parallelExecution in Test := false,

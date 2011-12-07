@@ -1,8 +1,8 @@
 /**
  * Copyright (C) 2011 Samira Tasharofi
  *
- * This test is taken from Akka library test suite: 
- * https://github.com/jboner/akka/blob/release-1.2/akka-actor-tests/src/test/scala/akka/actor/actor/ActorFireForgetRequestReplySpec.scala. 
+ * This test is taken from Akka library test suite:
+ * https://github.com/jboner/akka/blob/release-1.2/akka-actor-tests/src/test/scala/akka/actor/actor/ActorFireForgetRequestReplySpec.scala.
  * It is translated to Setak test to show how the test cases can be simplified using Setak.
  *
  * The commented lines show the parts that are eliminated from the
