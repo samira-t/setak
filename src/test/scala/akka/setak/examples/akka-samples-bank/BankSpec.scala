@@ -24,7 +24,7 @@ class BankSpec extends SetakWordSpec {
       val to = actorOf[Account].start
       try {
         bank ! Transfer(10, from, to)
-        
+
         /*
          * Eliminated by Setak. Setak does not need "Thread sleep" since whenStable would perform 
          * the funtionality of letting the actors finish processing their messages. 

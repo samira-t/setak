@@ -13,12 +13,14 @@ import java.util.concurrent.atomic.AtomicReference
 import com.eaio.uuid.UUID
 import akka.dispatch.Future
 import scala.collection.mutable.HashSet
+import akka.setak.util.TestActorRefFactory
 
 /**
  * @author <a href="http://www.cs.illinois.edu/homes/tasharo1">Samira Tasharofi</a>
  */
 
 class TestActorRef(
+  val testActorRefFactory: TestActorRefFactory,
   private[this] val actorFactory: () ⇒ Actor,
   val _homeAddress: Option[InetSocketAddress],
   traceMonitorActor: ActorRef)
@@ -260,6 +262,7 @@ class TestActorRef(
   def cloudIsEmpty = synchronized {
     _cloudMessages.isEmpty
   }
+
   private var debug = false
   private def log(s: String) = if (debug) println(s)
 

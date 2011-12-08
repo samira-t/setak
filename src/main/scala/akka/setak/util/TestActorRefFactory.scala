@@ -17,14 +17,16 @@ import akka.setak.core.TestActorRef
  * @author <a href="http://www.cs.illinois.edu/homes/tasharo1">Samira Tasharofi</a>
  *
  * The factory methods in Actor object should be replaced with the factory methods in this
- * object. It returns a TestActorRef as the reference instead of ActroRef
+ * object. It returns a TestActorRef as the reference instead of ActroRef.
+ * 
+ * For each test, a TestActorRefFactory is created that can be used for creating actors as instance of TestActroRef. 
+ * This factory is passed to each created (test) actor so that they can use that for creating child actors, i.e. dynamic creation of actors.
  */
 class TestActorRefFactory(traceMonitorActor: ActorRef) {
 
   /**
    *  Creates a TestActorRef out of the Actor with type T.
    * <pre>
-   *   import TestActorRefFactory._
    *   val actor = actorOf[MyActor]
    *   actor.start()
    *   actor ! message
@@ -40,7 +42,6 @@ class TestActorRefFactory(traceMonitorActor: ActorRef) {
   /**
    * Creates a TestActorRef out of the Actor of the specified Class.
    * <pre>
-   *   import TestActorRefFactory._
    *   val actor = actorOf(classOf[MyActor])
    *   actor.start()
    *   actor ! message
@@ -51,7 +52,7 @@ class TestActorRefFactory(traceMonitorActor: ActorRef) {
    *   val actor = actorOf(classOf[MyActor]).start()
    * </pre>
    */
-  def actorOf(clazz: Class[_ <: Actor]): TestActorRef = new TestActorRef(() ⇒ {
+  def actorOf(clazz: Class[_ <: Actor]): TestActorRef = new TestActorRef(this, () ⇒ {
     import ReflectiveAccess.{ createInstance, noParams, noArgs }
     createInstance[Actor](clazz.asInstanceOf[Class[_]], noParams, noArgs) match {
       case Right(actor) ⇒ actor
@@ -74,9 +75,13 @@ class TestActorRefFactory(traceMonitorActor: ActorRef) {
    * Creates a TestActorRef out of the Actor. Allows you to pass in a factory function
    * that creates the Actor. Please note that this function can be invoked multiple
    * times if for example the Actor is supervised and needs to be restarted.
+   * 
+   * TestActroRefFactory passes itself as an argument to the TestActorRef so that in the 
+   * case that actors are created dynamically inside of the actors (outside of the test class), they use the 
+   * same TestActorRefFactory.
+   * 
    * <p/>
    * <pre>
-   *   import TestActorRefFactory._
    *   val actor = actorOf(new MyActor)
    *   actor.start()
    *   actor ! message
@@ -87,6 +92,6 @@ class TestActorRefFactory(traceMonitorActor: ActorRef) {
    *   val actor = actorOf(new MyActor).start()
    * </pre>
    */
-  def actorOf(factory: ⇒ Actor): TestActorRef = new TestActorRef(() ⇒ factory, None, traceMonitorActor)
+  def actorOf(factory: ⇒ Actor): TestActorRef = new TestActorRef(this, () ⇒ factory, None, traceMonitorActor)
 
 }

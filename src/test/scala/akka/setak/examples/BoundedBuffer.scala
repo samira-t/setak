@@ -32,10 +32,11 @@ class BoundedBuffer(size: Int) extends Actor {
   var head, tail, curSize = 0
 
   def receive = {
-    case msg @ Put(x) ⇒ if (curSize < size) {
+    case Put(x) ⇒ if (curSize < size) {
       content(tail) = x
       tail = (tail + 1) % size
       curSize += 1
+
     }
     case Get ⇒ if (curSize > 0) {
       val r = content(head)
