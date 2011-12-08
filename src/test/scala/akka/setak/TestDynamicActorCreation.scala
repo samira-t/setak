@@ -12,8 +12,8 @@ import akka.setak.Commons._
 import akka.setak._
 
 /**
- * This test checks that the actor factory in the test is appropriately passed to each actor under test and they can use that factory 
- * for creating child actors. Therefore, all the dynamic created actors in a test would be under the control of the same test. 
+ * This test checks that the actor factory in the test is appropriately passed to each actor under test and they can use that factory
+ * for creating child actors. Therefore, all the dynamic created actors in a test would be under the control of the same test.
  */
 class MasterActor extends Actor {
 

@@ -18,8 +18,8 @@ import akka.setak.core.TestActorRef
  *
  * The factory methods in Actor object should be replaced with the factory methods in this
  * object. It returns a TestActorRef as the reference instead of ActroRef.
- * 
- * For each test, a TestActorRefFactory is created that can be used for creating actors as instance of TestActroRef. 
+ *
+ * For each test, a TestActorRefFactory is created that can be used for creating actors as instance of TestActroRef.
  * This factory is passed to each created (test) actor so that they can use that for creating child actors, i.e. dynamic creation of actors.
  */
 class TestActorRefFactory(traceMonitorActor: ActorRef) {
@@ -75,11 +75,11 @@ class TestActorRefFactory(traceMonitorActor: ActorRef) {
    * Creates a TestActorRef out of the Actor. Allows you to pass in a factory function
    * that creates the Actor. Please note that this function can be invoked multiple
    * times if for example the Actor is supervised and needs to be restarted.
-   * 
-   * TestActroRefFactory passes itself as an argument to the TestActorRef so that in the 
-   * case that actors are created dynamically inside of the actors (outside of the test class), they use the 
+   *
+   * TestActroRefFactory passes itself as an argument to the TestActorRef so that in the
+   * case that actors are created dynamically inside of the actors (outside of the test class), they use the
    * same TestActorRefFactory.
-   * 
+   *
    * <p/>
    * <pre>
    *   val actor = actorOf(new MyActor)

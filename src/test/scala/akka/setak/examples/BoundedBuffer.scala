@@ -140,36 +140,30 @@ class SpecTestBoundedBuffer extends SetakFlatSpec {
   }
 }
 class TestBoundedBufferWithProducerConsumer extends SetakJUnit {
-  var buf: TestActorRef = _
-  var consumer: TestActorRef = _
-  var producer: TestActorRef = _
-
-  var put: TestMessageEnvelop = _
-  var get: TestMessageEnvelop = _
 
   @Test
-  def testBufferWithProducerConsumer1() {
+  def testBufferWithProducerConsumer() {
     val buf = actorOf(new BoundedBuffer(1)).start
     val consumer = actorOf(new Consumer(buf)).start
     val producer = actorOf(new Producer(buf)).start
 
-    val put = testMessagePatternEnvelop(producer, buf, { case Put(_) ⇒ })
+    val put1 = testMessageEnvelop(producer, buf, Put(1))
     val get = testMessageEnvelop(anyActorRef, buf, Get)
 
     //step 1
-    setSchedule(put -> get)
+    consumer ! Consume(1)
+
+    whenStable {
+      assert((consumer ? GetToken).mapTo[Int].get == -2)
+    }
+
+    //step 2
+    setSchedule(put1 -> get)
     producer ! Produce(List(1))
     consumer ! Consume(1)
 
     whenStable {
       assert((consumer ? GetToken).mapTo[Int].get == 1)
-    }
-
-    //step 2
-    consumer ! Consume(1)
-
-    whenStable {
-      assert((consumer ? GetToken).mapTo[Int].get == -2)
     }
 
   }
