@@ -31,7 +31,7 @@ How to Use
 Releases and snapshots are located at (http://mir.cs.illinois.edu/setac/setak/), 
 which can be used in sbt by adding the following lines:
 
-    resolvers += "setak" at "http://mir.cs.illinois.edu/setac/setak/snapshots/"
+    resolvers += "setak" at "http://mir.cs.illinois.edu/setak/snapshots/"
     
     libraryDependencies += "edu.illinois" %% "setak" % "1.0-SNAPSHOT"
 
