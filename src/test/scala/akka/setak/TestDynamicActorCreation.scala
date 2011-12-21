@@ -18,7 +18,11 @@ import akka.setak._
 class MasterActor extends Actor {
 
   def receive = {
-    case 'createUsingTestFactory ⇒ {
+    case 'createUsingSelfTestFactory ⇒ {
+      val child = self.asInstanceOf[TestActorRef].testActorRefFactory.actorOf(new Actor { def receive = { case _ ⇒ } })
+      self.reply(child)
+    }
+    case 'createUsingCommonPoolTestFactory ⇒ {
       val child = akka.setak.Commons.testFactoryPool.peek().actorOf(new Actor { def receive = { case _ ⇒ } })
       self.reply(child)
     }
@@ -30,12 +34,20 @@ class MasterActor extends Actor {
 }
 class TestDynamicActorCreation extends SetakFlatSpec {
 
-  "The child actor" should "be an insatnce of TestActroRef" in {
+  "The child actor created by self factory" should
+    "be an insatnce of TestActroRef" in {
 
-    val master = actorOf[MasterActor].start
-    assert((master ? 'createUsingTestFactory).get.isInstanceOf[TestActorRef])
+      val master = actorOf[MasterActor].start
+      assert((master ? 'createUsingSelfTestFactory).get.isInstanceOf[TestActorRef])
 
-  }
+    }
+  "The child actor created by common pool factory" should
+    "be an insatnce of TestActroRef" in {
+
+      val master = actorOf[MasterActor].start
+      assert((master ? 'createUsingCommonPoolTestFactory).get.isInstanceOf[TestActorRef])
+
+    }
 
   "The child actor" should " not be an insatnce of TestActroRef" in {
 

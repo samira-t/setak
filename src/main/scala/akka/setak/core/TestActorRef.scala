@@ -20,6 +20,7 @@ import akka.setak.util.TestActorRefFactory
  */
 
 class TestActorRef(
+  val testActorRefFactory: TestActorRefFactory,
   val anonymousSchedule: TestMessageEnvelopSequence,
   private[this] val actorFactory: () ⇒ Actor,
   val _homeAddress: Option[InetSocketAddress],

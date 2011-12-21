@@ -11,6 +11,7 @@ import scala.collection.mutable.ArrayBuffer
 import akka.setak.TestConfig
 import monitor._
 import akka.setak.core.MessageEventEnum._
+import akka.dispatch.FutureTimeoutException
 
 /**
  * @author <a href="http://www.cs.illinois.edu/homes/tasharo1">Samira Tasharofi</a>
@@ -94,36 +95,35 @@ class TestExecutionManager(traceMonitorActor: ActorRef) {
     }
 
   /**
-   * waits for a message to be processed.
+   * Waits for a test message messages to be processed.
+   * The timeout is specified in TestConfig.timeOutForMessages.
    *
-   * It tries to check the stability of the system by giving maxTry. the default is 20 times
-   * and each time it sleeps 100 milliseconds before trying again.
-   *
-   * @return false if the message is not processed with that maxTry
-   *
-   *
+   * @return false if the message is not processed with the timeout.
    */
   def waitForMessage(message: TestMessageEnvelop): Boolean =
     {
-      val isProcseed = traceMonitorActor ? NotifyMeForMessageEvent(message, Processed)
-      return isProcseed.mapTo[Boolean].get
+      try {
+        val isProcseed = traceMonitorActor.ask(NotifyMeForMessageEvent(message, Processed), TestConfig.timeOutForMessages).mapTo[Boolean].get
+      } catch {
+        case ex: FutureTimeoutException ⇒ return false
+      }
+      return true
     }
 
   /**
    * waits for all test messages to be processed.
+   * The timeout is specified in TestConfig.timeOutForMessages.
    *
-   * It tries to check the stability of the system by giving maxTry. the default is 20 times
-   * and each time it sleeps 100 milliseconds before trying again.
-   *
-   * @return false if the message is not processed with that maxTry
-   *
-   *
+   * @return false if the message all the test messages are not processed with the timeout.
    */
   def waitForAllMessages(): Boolean =
     {
-      val isProcseed = traceMonitorActor ? NotifyMeForMessageEvent(null, Processed)
-      val res = isProcseed.mapTo[Boolean].get
-      return res
+      try {
+        val isProcseed = traceMonitorActor.ask(NotifyMeForMessageEvent(null, Processed), TestConfig.timeOutForMessages).mapTo[Boolean].get
+      } catch {
+        case ex: FutureTimeoutException ⇒ return false
+      }
+      return true
     }
 
   /**

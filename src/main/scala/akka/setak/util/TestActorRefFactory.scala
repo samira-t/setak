@@ -53,7 +53,7 @@ class TestActorRefFactory(test: SetakTest) {
    *   val actor = actorOf(classOf[MyActor]).start()
    * </pre>
    */
-  def actorOf(clazz: Class[_ <: Actor]): TestActorRef = new TestActorRef(test.anonymousSchedule, () ⇒ {
+  def actorOf(clazz: Class[_ <: Actor]): TestActorRef = new TestActorRef(test.testActorRefFactory, test.anonymousSchedule, () ⇒ {
     import ReflectiveAccess.{ createInstance, noParams, noArgs }
     createInstance[Actor](clazz.asInstanceOf[Class[_]], noParams, noArgs) match {
       case Right(actor) ⇒ actor
@@ -93,6 +93,6 @@ class TestActorRefFactory(test: SetakTest) {
    *   val actor = actorOf(new MyActor).start()
    * </pre>
    */
-  def actorOf(factory: ⇒ Actor): TestActorRef = new TestActorRef(test.anonymousSchedule, () ⇒ factory, None, test.traceMonitorActor)
+  def actorOf(factory: ⇒ Actor): TestActorRef = new TestActorRef(test.testActorRefFactory, test.anonymousSchedule, () ⇒ factory, None, test.traceMonitorActor)
 
 }
