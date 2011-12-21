@@ -12,6 +12,7 @@ import java.lang.reflect.InvocationTargetException
 import com.eaio.uuid.UUID
 import akka.actor.ActorRef
 import akka.setak.core.TestActorRef
+import akka.setak.SetakTest
 
 /**
  * @author <a href="http://www.cs.illinois.edu/homes/tasharo1">Samira Tasharofi</a>
@@ -22,7 +23,7 @@ import akka.setak.core.TestActorRef
  * For each test, a TestActorRefFactory is created that can be used for creating actors as instance of TestActroRef.
  * This factory is passed to each created (test) actor so that they can use that for creating child actors, i.e. dynamic creation of actors.
  */
-class TestActorRefFactory(traceMonitorActor: ActorRef) {
+class TestActorRefFactory(test: SetakTest) {
 
   /**
    *  Creates a TestActorRef out of the Actor with type T.
@@ -52,7 +53,7 @@ class TestActorRefFactory(traceMonitorActor: ActorRef) {
    *   val actor = actorOf(classOf[MyActor]).start()
    * </pre>
    */
-  def actorOf(clazz: Class[_ <: Actor]): TestActorRef = new TestActorRef(this, () ⇒ {
+  def actorOf(clazz: Class[_ <: Actor]): TestActorRef = new TestActorRef(test.anonymousSchedule, () ⇒ {
     import ReflectiveAccess.{ createInstance, noParams, noArgs }
     createInstance[Actor](clazz.asInstanceOf[Class[_]], noParams, noArgs) match {
       case Right(actor) ⇒ actor
@@ -69,7 +70,7 @@ class TestActorRefFactory(traceMonitorActor: ActorRef) {
             "\nOR try to change: 'actorOf[MyActor]' to 'actorOf(new MyActor)'.", cause)
     }
 
-  }, None, traceMonitorActor)
+  }, None, test.traceMonitorActor)
 
   /**
    * Creates a TestActorRef out of the Actor. Allows you to pass in a factory function
@@ -92,6 +93,6 @@ class TestActorRefFactory(traceMonitorActor: ActorRef) {
    *   val actor = actorOf(new MyActor).start()
    * </pre>
    */
-  def actorOf(factory: ⇒ Actor): TestActorRef = new TestActorRef(this, () ⇒ factory, None, traceMonitorActor)
+  def actorOf(factory: ⇒ Actor): TestActorRef = new TestActorRef(test.anonymousSchedule, () ⇒ factory, None, test.traceMonitorActor)
 
 }

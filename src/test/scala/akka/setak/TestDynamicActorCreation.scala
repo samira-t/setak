@@ -19,7 +19,7 @@ class MasterActor extends Actor {
 
   def receive = {
     case 'createUsingTestFactory ⇒ {
-      val child = self.asInstanceOf[TestActorRef].testActorRefFactory.actorOf(new Actor { def receive = { case _ ⇒ } })
+      val child = akka.setak.Commons.testFactoryPool.peek().actorOf(new Actor { def receive = { case _ ⇒ } })
       self.reply(child)
     }
     case 'createUsingAkkaFactory ⇒ {

@@ -12,6 +12,7 @@ import akka.setak.core.TestMessageEnvelop
 import akka.setak.core.RealMessageEnvelop
 import akka.setak.core.MessageEventEnum._
 import akka.actor.LocalActorRef
+import akka.actor.UntypedChannel
 
 abstract class MonitorActorMessage
 case class AsyncMessageEvent(message: RealMessageEnvelop, event: MessageEventType) extends MonitorActorMessage
@@ -19,6 +20,8 @@ case class ReplyMessageEvent(message: RealMessageEnvelop) extends MonitorActorMe
 case class MatchedMessageEventCount(testMessage: TestMessageEnvelop, event: MessageEventType) extends MonitorActorMessage
 case class AddTestMessageEnvelop(testMessage: TestMessageEnvelop) extends MonitorActorMessage
 case object AllDeliveredMessagesAreProcessed extends MonitorActorMessage
+case object AllTestMessagesAreProcessed extends MonitorActorMessage
+case class NotifyMeForMessageEvent(testMessage: TestMessageEnvelop, event: MessageEventType) extends MonitorActorMessage
 case object NotProcessedMessages extends MonitorActorMessage
 case object ClearState extends MonitorActorMessage
 
@@ -39,6 +42,7 @@ class TraceMonitorActor() extends Actor {
   var testMessagesInfo = new HashMap[TestMessageEnvelop, Array[Int]]()
   var deliveredAsyncMessages = new ArrayBuffer[RealMessageEnvelop]()
   var messageTrace = new ListBuffer[TestMessageEnvelop]
+  var listener: Listener = null
 
   def receive =
     {
@@ -64,6 +68,9 @@ class TraceMonitorActor() extends Actor {
 
           }
         }
+        if (matchedTestMessageEnvelops.size > 0 && listener != null) {
+          notifyListener()
+        }
       }
       case ReplyMessageEvent(message) ⇒ {
         //        messageTrace.+=(message)
@@ -72,6 +79,11 @@ class TraceMonitorActor() extends Actor {
           testMessagesInfo.update(testMsg, Array(dp(0) + 1, dp(1) + 1))
         }
 
+      }
+
+      case NotifyMeForMessageEvent(testMessage, event) ⇒ {
+        listener = Listener(self.channel, testMessage, event)
+        notifyListener()
       }
       /**
        * returns the set of the real  messages that are matched with the test message and the specified event
@@ -98,8 +110,46 @@ class TraceMonitorActor() extends Actor {
 
     }
 
+  private def notifyListener() {
+    listener.event match {
+      case Processed ⇒ {
+        if ((listener.testMessage != null && testMessagesInfo(listener.testMessage)(1) > 0) ||
+          (listener.testMessage == null && allTestMessagesAreProcessed)) {
+          listener.channel ! true
+          listener = null
+
+        }
+      }
+      case Delivered ⇒ {
+        if ((listener.testMessage != null && testMessagesInfo(listener.testMessage)(0) > 0) ||
+          (listener.testMessage == null && allTestMessagesAreDelivered)) {
+          listener.channel ! true
+          listener = null
+
+        }
+
+      }
+    }
+
+  }
+
+  private def allTestMessagesAreProcessed(): Boolean = {
+    for ((message, Array(deliverCount, processCount)) ← testMessagesInfo) {
+      if (processCount == 0) return false
+    }
+    return true
+  }
+
+  private def allTestMessagesAreDelivered(): Boolean = {
+    for ((message, Array(deliverCount, processCount)) ← testMessagesInfo) {
+      if (deliverCount == 0) return false
+    }
+    return true
+  }
+
   //for debugging only
   private var debug = false
   private def log(s: String) = if (debug) println(s)
 
 }
+case class Listener(channel: UntypedChannel, testMessage: TestMessageEnvelop, event: MessageEventType)

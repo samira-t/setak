@@ -22,6 +22,8 @@ class BankSpec extends SetakWordSpec {
       val bank = actorOf[Bank].start
       val from = actorOf[Account].start
       val to = actorOf[Account].start
+      val withdraw = testMessageEnvelop(bank, from, Withdraw(10))
+      val deposit = testMessageEnvelop(bank, to, Deposit(10))
       try {
         bank ! Transfer(10, from, to)
 
@@ -31,7 +33,7 @@ class BankSpec extends SetakWordSpec {
          */
         //Thread sleep 1000 // Let's wait until the transfer is finished!
 
-        whenStable {
+        afterAllMessages {
           val fromBalance = from !! GetBalance
           fromBalance must equal(Some(Balance(-10)))
           val toBalance = to !! GetBalance

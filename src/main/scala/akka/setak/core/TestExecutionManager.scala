@@ -5,12 +5,12 @@ package akka.setak.core
 import akka.actor.Actor
 import akka.actor.ActorRef
 import monitor.NotProcessedMessages
-import monitor.AllDeliveredMessagesAreProcessed
 import akka.actor.LocalActorRef
 import scala.collection.mutable.HashSet
 import scala.collection.mutable.ArrayBuffer
 import akka.setak.TestConfig
 import monitor._
+import akka.setak.core.MessageEventEnum._
 
 /**
  * @author <a href="http://www.cs.illinois.edu/homes/tasharo1">Samira Tasharofi</a>
@@ -91,6 +91,39 @@ class TestExecutionManager(traceMonitorActor: ActorRef) {
       if (!isStable) { log("no stable=" + reason); if (notProcessedMessages.size > 0) log(notProcessedMessages.head._message.toString()) }
       isStable
 
+    }
+
+  /**
+   * waits for a message to be processed.
+   *
+   * It tries to check the stability of the system by giving maxTry. the default is 20 times
+   * and each time it sleeps 100 milliseconds before trying again.
+   *
+   * @return false if the message is not processed with that maxTry
+   *
+   *
+   */
+  def waitForMessage(message: TestMessageEnvelop): Boolean =
+    {
+      val isProcseed = traceMonitorActor ? NotifyMeForMessageEvent(message, Processed)
+      return isProcseed.mapTo[Boolean].get
+    }
+
+  /**
+   * waits for all test messages to be processed.
+   *
+   * It tries to check the stability of the system by giving maxTry. the default is 20 times
+   * and each time it sleeps 100 milliseconds before trying again.
+   *
+   * @return false if the message is not processed with that maxTry
+   *
+   *
+   */
+  def waitForAllMessages(): Boolean =
+    {
+      val isProcseed = traceMonitorActor ? NotifyMeForMessageEvent(null, Processed)
+      val res = isProcseed.mapTo[Boolean].get
+      return res
     }
 
   /**

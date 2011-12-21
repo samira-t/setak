@@ -8,7 +8,6 @@ import util.TestMessageEnvelopUtil
 import core.TestMessageEnvelop
 import core.TestActorRef
 import util.TestActorRefFactory
-import util.TestExecutionUtil
 import core.TestMessageEnvelopSequence
 import akka.actor.Actor
 import akka.japi.Creator
@@ -19,7 +18,9 @@ trait SetakTest {
   var traceMonitorActor = akka.actor.Actor.actorOf[TraceMonitorActor].start()
   var testExecutionManager = new TestExecutionManager(traceMonitorActor)
   var testMessageUtil = new TestMessageEnvelopUtil(traceMonitorActor)
-  var testActorRefFactory = new TestActorRefFactory(traceMonitorActor)
+  var anonymousSchedule: TestMessageEnvelopSequence = null
+  var testActorRefFactory = new TestActorRefFactory(this)
+  Commons.testFactoryPool.add(testActorRefFactory)
   var testInitialized = true
 
   def superBeforeEach() {
@@ -27,12 +28,16 @@ trait SetakTest {
       traceMonitorActor = akka.actor.Actor.actorOf[TraceMonitorActor].start()
       testExecutionManager = new TestExecutionManager(traceMonitorActor)
       testMessageUtil = new TestMessageEnvelopUtil(traceMonitorActor)
-      testActorRefFactory = new TestActorRefFactory(traceMonitorActor)
+      testActorRefFactory = new TestActorRefFactory(this)
+      Commons.testFactoryPool.add(testActorRefFactory)
+      anonymousSchedule = null
+      testInitialized = true
     }
   }
 
   def superAfterEach() {
     testExecutionManager.stopTest
+    Commons.testFactoryPool.remove(this)
     testInitialized = false
   }
 
@@ -48,9 +53,30 @@ trait SetakTest {
   }
 
   /**
+   * Waits for a test message to be processed and then executes the body which is usually a set of
+   * assertion statements.
+   */
+  def afterMessage(testMessage: TestMessageEnvelop)(body: ⇒ Unit) {
+    val processed = testExecutionManager.waitForMessage(testMessage)
+    if (processed) {
+      body
+    } else throw new Exception("The message didn't get processed")
+  }
+
+  /**
+   * Waits for all test messages to be processed and then executes the body which is usually a set of
+   * assertion statements.
+   */
+  def afterAllMessages(body: ⇒ Unit) {
+    val processed = testExecutionManager.waitForAllMessages()
+    if (processed) {
+      body
+    } else throw new Exception("Some of the messages didn't get processed")
+  }
+  /**
    * After the timeout, executes the body that usually contains some assertions.
    */
-  def after(timeout: Long)(body: ⇒ Unit) = {
+  def afterTimeOut(timeout: Long)(body: ⇒ Unit) = {
     Thread.sleep(timeout)
     body
   }
@@ -84,15 +110,25 @@ trait SetakTest {
    */
   def processingCount(testMessage: TestMessageEnvelop) = testMessageUtil.processingCount(testMessage)
 
-  /*
- * TestExecutionUtil API call
- */
   /**
    * API for constraining the schedule of test execution and removing some non-determinism by specifying
    * a set of partial orders between the messages. The receivers of the messages in each partial order should
    * be the same (an instance of TestActorRef)
    */
-  def setSchedule(partialOrders: TestMessageEnvelopSequence*) = TestExecutionUtil.setSchedule(partialOrders.toSet)
+  def setSchedule(partialOrders: TestMessageEnvelopSequence*) {
+    /*
+     * TODO: check if the receivers of all messages in each partial order are the same
+     */
+    for (po ← partialOrders) {
+      if (po.head._receiver.isInstanceOf[TestActorRef]) {
+        po.head._receiver.asInstanceOf[TestActorRef].addPartialOrderToSchedule(po)
+      } else if (po.head._receiver == Commons.anyActorRef) {
+        anonymousSchedule = po
+      } else {
+        throw new Exception("The receiver of the test message in a schedule should be anyActorRef or an instance of TestActorRef")
+      }
+    }
+  }
 
   /*
    * testActorRefFactory API calls

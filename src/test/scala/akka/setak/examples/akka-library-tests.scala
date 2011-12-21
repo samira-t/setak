@@ -119,13 +119,14 @@ class ActorFireForgetRequestReplySpec extends SetakWordSpec with MustMatchers { 
     "should shutdown crashed temporary actor" in {
       val actor = actorOf[CrashingTemporaryActor].start()
       actor.isRunning must be(true)
+      val die = testMessageEnvelop(anyActorRef, actor, "Die")
       actor ! "Die"
 
       //state.finished.await
       //sleepFor(1 second)
 
       /* Added by Setak*/
-      after(1000) {
+      afterMessage(die) {
         actor.isShutdown must be(true)
       }
     }

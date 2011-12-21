@@ -20,7 +20,7 @@ import akka.setak.util.TestActorRefFactory
  */
 
 class TestActorRef(
-  val testActorRefFactory: TestActorRefFactory,
+  val anonymousSchedule: TestMessageEnvelopSequence,
   private[this] val actorFactory: () ⇒ Actor,
   val _homeAddress: Option[InetSocketAddress],
   traceMonitorActor: ActorRef)
@@ -38,7 +38,10 @@ class TestActorRef(
    * TestSchedule is thread-safe.
    */
   @volatile
-  private var _currentSchedule: TestSchedule = null
+  private var _currentSchedule: TestSchedule =
+    if (anonymousSchedule != null)
+      new TestSchedule(Set(anonymousSchedule))
+    else null
 
   /**
    * Callback for the Dispatcher. Informs the monitor actor about processing a message.
