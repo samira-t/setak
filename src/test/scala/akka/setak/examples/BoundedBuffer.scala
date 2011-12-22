@@ -168,4 +168,34 @@ class TestBoundedBufferWithProducerConsumer extends SetakJUnit {
 
   }
 }
+class TestBoundedBufferWithProducerConsumerUsingAfterMessage extends SetakJUnit {
+
+  @Test
+  def testBufferWithProducerConsumer() {
+    val buf = actorOf(new BoundedBuffer(1)).start
+    val consumer = actorOf(new Consumer(buf)).start
+    val producer = actorOf(new Producer(buf)).start
+
+    val put1 = testMessageEnvelop(producer, buf, Put(1))
+    val get1 = testMessageEnvelop(anyActorRef, buf, Get)
+    val get2 = testMessageEnvelop(anyActorRef, buf, Get)
+
+    //step 1
+    consumer ! Consume(1)
+
+    afterMessage(get1) {
+      assert((consumer ? GetToken).mapTo[Int].get == -2)
+    }
+
+    //step 2
+    setSchedule(put1 -> get2)
+    producer ! Produce(List(1))
+    consumer ! Consume(1)
+
+    afterAllMessages {
+      assert((consumer ? GetToken).mapTo[Int].get == 1)
+    }
+
+  }
+}
 
