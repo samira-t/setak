@@ -21,7 +21,7 @@ case class MatchedMessageEventCount(testMessage: TestMessageEnvelop, event: Mess
 case class AddTestMessageEnvelop(testMessage: TestMessageEnvelop) extends MonitorActorMessage
 case object AllDeliveredMessagesAreProcessed extends MonitorActorMessage
 case object AllTestMessagesAreProcessed extends MonitorActorMessage
-case class NotifyMeForMessageEvent(testMessage: TestMessageEnvelop, event: MessageEventType) extends MonitorActorMessage
+case class NotifyMeForMessageEvent(testMessages: Set[TestMessageEnvelop], event: MessageEventType) extends MonitorActorMessage
 case object NotProcessedMessages extends MonitorActorMessage
 case object ClearState extends MonitorActorMessage
 
@@ -81,8 +81,8 @@ class TraceMonitorActor() extends Actor {
 
       }
 
-      case NotifyMeForMessageEvent(testMessage, event) ⇒ {
-        listener = Listener(self.channel, testMessage, event)
+      case NotifyMeForMessageEvent(testMessages, event) ⇒ {
+        listener = Listener(self.channel, testMessages, event)
         notifyListener()
       }
       /**
@@ -113,16 +113,16 @@ class TraceMonitorActor() extends Actor {
   private def notifyListener() {
     listener.event match {
       case Processed ⇒ {
-        if ((listener.testMessage != null && testMessagesInfo(listener.testMessage)(1) > 0) ||
-          (listener.testMessage == null && allTestMessagesAreProcessed)) {
+        if ((listener.testMessages != null && allListenerTestMessagesAreProcessed) ||
+          (listener.testMessages == null && allTestMessagesAreProcessed)) {
           listener.channel ! true
           listener = null
 
         }
       }
       case Delivered ⇒ {
-        if ((listener.testMessage != null && testMessagesInfo(listener.testMessage)(0) > 0) ||
-          (listener.testMessage == null && allTestMessagesAreDelivered)) {
+        if ((listener.testMessages != null && allListenerTestMessagesAreDelivered) ||
+          (listener.testMessages == null && allTestMessagesAreDelivered)) {
           listener.channel ! true
           listener = null
 
@@ -139,6 +139,18 @@ class TraceMonitorActor() extends Actor {
     }
     return true
   }
+  private def allListenerTestMessagesAreProcessed(): Boolean = {
+    for (message ← listener.testMessages) {
+      if (testMessagesInfo(message)(1) == 0) return false
+    }
+    return true
+  }
+  private def allListenerTestMessagesAreDelivered(): Boolean = {
+    for (message ← listener.testMessages) {
+      if (testMessagesInfo(message)(0) == 0) return false
+    }
+    return true
+  }
 
   private def allTestMessagesAreDelivered(): Boolean = {
     for ((message, Array(deliverCount, processCount)) ← testMessagesInfo) {
@@ -152,4 +164,4 @@ class TraceMonitorActor() extends Actor {
   private def log(s: String) = if (debug) println(s)
 
 }
-case class Listener(channel: UntypedChannel, testMessage: TestMessageEnvelop, event: MessageEventType)
+case class Listener(channel: UntypedChannel, testMessages: Set[TestMessageEnvelop], event: MessageEventType)

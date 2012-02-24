@@ -100,10 +100,10 @@ class TestExecutionManager(traceMonitorActor: ActorRef) {
    *
    * @return false if the message is not processed with the timeout.
    */
-  def waitForMessage(message: TestMessageEnvelop): Boolean =
+  def waitForMessage(messages: Set[TestMessageEnvelop]): Boolean =
     {
       try {
-        val isProcseed = traceMonitorActor.ask(NotifyMeForMessageEvent(message, Processed), TestConfig.timeOutForMessages).mapTo[Boolean].get
+        val isProcseed = traceMonitorActor.ask(NotifyMeForMessageEvent(messages, Processed), TestConfig.timeOutForMessages).mapTo[Boolean].get
       } catch {
         case ex: FutureTimeoutException ⇒ return false
       }
@@ -136,10 +136,11 @@ class TestExecutionManager(traceMonitorActor: ActorRef) {
 
     //Stop other actors including the monitor actor
     for (actor ← Actor.registry) {
-      if (actor.isRunning) {
+      if (actor.isInstanceOf[TestActorRef] && actor.isRunning) {
         actor.stop
       }
     }
+    traceMonitorActor.stop
 
   }
 

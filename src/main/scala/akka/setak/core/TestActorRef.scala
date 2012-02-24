@@ -83,7 +83,8 @@ class TestActorRef(
    * @return reference to the actor object, where the static type matches the factory used inside the
    * constructor. This reference is discarded upon restarting the actor
    */
-  def actorObject[T <: Actor]: T = actorInstance.asInstanceOf[AtomicReference[T]].get
+  def actorObject[T <: Actor] = this.actor.asInstanceOf[T]
+  private implicit def underlyingActor = this.actor
 
   /**
    * Overrides the postMessageToMailbox to apply the constraints in the schedule if there is any
@@ -270,5 +271,9 @@ class TestActorRef(
   private var debug = false
   private def log(s: String) = if (debug) println(s)
 
+}
+
+object TestActorRef {
+  implicit def toTestAtorRef(actorRef: ActorRef) = actorRef.asInstanceOf[TestActorRef]
 }
 

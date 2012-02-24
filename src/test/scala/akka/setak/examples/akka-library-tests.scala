@@ -126,8 +126,9 @@ class ActorFireForgetRequestReplySpec extends SetakWordSpec with MustMatchers { 
       //sleepFor(1 second)
 
       /* Added by Setak*/
-      afterMessage(die) {
+      afterMessages(die) {
         actor.isShutdown must be(true)
+
       }
     }
   }

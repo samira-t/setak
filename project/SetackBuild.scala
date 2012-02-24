@@ -28,7 +28,7 @@ object setakBuild extends Build {
         Resolver.ssh(s, "mir.cs.uiuc.edu", "/mounts/mir/disks/0/marinov/tasharo1/www/" + s + "/") as ("tasharo1", file("C:/Users/tasharo1/Desktop/keymir.ppk")) withPermissions("0644")
         
         //Resolver.ssh(s, "sal.cs.uiuc.edu", "/home/cs/tasharo1/public_html/setak/" + s + "/") as("tasharo1") withPermissions("0644")
-      Some(if (version.trim.endsWith("SNAPSHOT")) repo("snapshots") else repo("releases"))
+      Some(if (version.trim.endsWith("SNAPSHOT")) repo("snapshots-temp") else repo("releases"))
     })
 
   

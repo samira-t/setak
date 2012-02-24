@@ -50,7 +50,7 @@ class JUnitTestMessageEnvelopMatching extends SetakJUnit {
     a ! BooleanMessage(false)
     a ! BooleanMessage(false)
 
-    whenStable {
+    afterMessages(int1) {
       assert(isDelivered(int1))
       assert(isProcessed(intAny))
       assert(deliveryCount(intAny) == 2)
@@ -78,11 +78,11 @@ class ScalaTestMessageEnvelopMatching extends SetakFlatSpec with org.scalatest.m
 
   "The Int and Bool messages" should "be processed" in {
     testActor ! IntMessage(5)
+    testActor ! BooleanMessage(false)
+    testActor ! BooleanMessage(false)
     testActor ! IntMessage(1)
-    testActor ! BooleanMessage(false)
-    testActor ! BooleanMessage(false)
 
-    whenStable {
+    afterMessages(int1, bAny) {
       isDelivered(int1) should be(true)
       isProcessed(intAny) should be(true)
       deliveryCount(intAny) should be(2)

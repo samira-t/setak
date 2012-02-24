@@ -84,7 +84,7 @@ class JUnitTestBoundedBuffer extends SetakJUnit {
   def testPutGet() {
     buf ! Put(12)
 
-    afterMessage(put) {
+    afterMessages(put) {
       assert(buf.actorObject[BoundedBuffer].curSize == 1, "The current size is not one")
     }
 
@@ -162,7 +162,7 @@ class TestBoundedBufferWithProducerConsumer extends SetakJUnit {
     producer ! Produce(List(1))
     consumer ! Consume(1)
 
-    afterMessage(get) {
+    afterMessages(get) {
       assert((consumer ? GetToken).mapTo[Int].get == 1)
     }
 
@@ -183,7 +183,7 @@ class TestBoundedBufferWithProducerConsumerUsingAfterMessage extends SetakJUnit 
     //step 1
     consumer ! Consume(1)
 
-    afterMessage(get1) {
+    afterMessages(get1) {
       assert((consumer ? GetToken).mapTo[Int].get == -2)
     }
 

@@ -56,8 +56,8 @@ trait SetakTest {
    * Waits for a test message to be processed and then executes the body which is usually a set of
    * assertion statements.
    */
-  def afterMessage(testMessage: TestMessageEnvelop)(body: ⇒ Unit) {
-    val processed = testExecutionManager.waitForMessage(testMessage)
+  def afterMessages(testMessages: TestMessageEnvelop*)(body: ⇒ Unit) {
+    val processed = testExecutionManager.waitForMessage(testMessages.toSet[TestMessageEnvelop])
     if (processed) {
       body
     } else throw new Exception("The message didn't get processed")
